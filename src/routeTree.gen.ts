@@ -13,23 +13,29 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AuthImport } from './routes/auth'
+import { Route as ProtectedRoutesDashboardImport } from './routes/_protectedRoutes/dashboard'
 
 // Create Virtual Routes
 
-const AuthLazyImport = createFileRoute('/auth')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
-const AuthLazyRoute = AuthLazyImport.update({
+const AuthRoute = AuthImport.update({
   path: '/auth',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/auth.lazy').then((d) => d.Route))
+} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ProtectedRoutesDashboardRoute = ProtectedRoutesDashboardImport.update({
+  path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -46,7 +52,14 @@ declare module '@tanstack/react-router' {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
-      preLoaderRoute: typeof AuthLazyImport
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
+    '/_protectedRoutes/dashboard': {
+      id: '/_protectedRoutes/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ProtectedRoutesDashboardImport
       parentRoute: typeof rootRoute
     }
   }
@@ -56,7 +69,8 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  AuthLazyRoute,
+  AuthRoute,
+  ProtectedRoutesDashboardRoute,
 })
 
 /* prettier-ignore-end */
@@ -68,14 +82,18 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/auth"
+        "/auth",
+        "/_protectedRoutes/dashboard"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
     "/auth": {
-      "filePath": "auth.lazy.tsx"
+      "filePath": "auth.tsx"
+    },
+    "/_protectedRoutes/dashboard": {
+      "filePath": "_protectedRoutes/dashboard.tsx"
     }
   }
 }

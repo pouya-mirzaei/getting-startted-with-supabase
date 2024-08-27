@@ -1,12 +1,22 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { HiOutlineKey } from 'react-icons/hi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 import supabase from '@/configs/supabase';
+import { isUserLoggedIn } from '@/utils/auth';
 
-export const Route = createLazyFileRoute('/auth')({
+export const Route = createFileRoute('/auth')({
+  beforeLoad: async () => {
+    const status = await isUserLoggedIn();
+
+    if (status) {
+      throw redirect({
+        to: '/dashboard',
+      });
+    }
+  },
   component: Auth,
 });
 
@@ -15,7 +25,7 @@ function Auth() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: 'http://localhost:5173/',
+        redirectTo: window.location.origin,
       },
     });
 
@@ -28,7 +38,7 @@ function Auth() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center justify-center">
+    <div className="flex w-full h-[calc(100vh-53px)] flex-col items-center justify-center relative">
       <div className="w-96">
         <Card className="w-full relative z-10">
           <CardHeader>

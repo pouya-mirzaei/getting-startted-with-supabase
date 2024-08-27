@@ -7,14 +7,10 @@ export const Route = createLazyFileRoute('/')({
 });
 
 function Index() {
-  supabase.auth.getUser().then((res) => console.log(res.data.user));
-
   return (
-    <section className="max-w-7xl mx-auto min-w-[900px] mt-10">
+    <section>
       <nav>
-        <Link to="/auth">
-          <Button>Auth</Button>
-        </Link>
+        <h1 className="text-primary">Hello world</h1>
       </nav>
     </section>
   );
